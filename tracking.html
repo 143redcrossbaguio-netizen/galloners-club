@@ -118,82 +118,9 @@ function renderTable(category=null){
     });
 }
 
-function toggleSerial(index){
-    let donors = JSON.parse(localStorage.getItem("donors")) || [];
-    let row = document.getElementById("serialRow"+index);
-    let container = document.getElementById("serialList"+index);
-
-    if(row.style.display==="none"){
-        let serials = donors[index].serials || [];
-        container.innerHTML = "";
-
-        if(serials.length===0){
-            container.innerHTML="No serial numbers.";
-        }else{
-            serials.forEach((s,i)=>{
-
-                let serialValue = s.number || "";
-                let dateValue = s.date || "";
-
-                container.innerHTML += `
-                    <div id="serialDisplay${index}_${i}">
-                        Serial: ${serialValue} | Date: ${dateValue}
-                        <button class="edit-btn" onclick="editSerial(${index},${i})">Edit</button>
-                        <button class="delete-btn" onclick="deleteSerial(${index},${i})">Delete</button>
-                    </div>
-                    <br>
-                `;
-            });
-        }
-
-        row.style.display="table-row";
-    }else{
-        row.style.display="none";
-    }
-}
-
-/* UPDATED — INLINE EDIT */
-function editSerial(donorIndex, serialIndex){
-    let donors = JSON.parse(localStorage.getItem("donors")) || [];
-    let serial = donors[donorIndex].serials[serialIndex];
-
-    let container = document.getElementById(`serialDisplay${donorIndex}_${serialIndex}`);
-
-    container.innerHTML = `
-        <input type="text" id="editSerialInput${donorIndex}_${serialIndex}" value="${serial.number || ""}">
-        <input type="date" id="editDateInput${donorIndex}_${serialIndex}" value="${serial.date || ""}">
-        <button class="edit-btn" onclick="saveSerialEdit(${donorIndex},${serialIndex})">Save</button>
-        <button class="delete-btn" onclick="toggleSerial(${donorIndex})">Cancel</button>
-    `;
-}
-
-function saveSerialEdit(donorIndex, serialIndex){
-    let donors = JSON.parse(localStorage.getItem("donors")) || [];
-
-    let newSerial = document.getElementById(`editSerialInput${donorIndex}_${serialIndex}`).value;
-    let newDate = document.getElementById(`editDateInput${donorIndex}_${serialIndex}`).value;
-
-    donors[donorIndex].serials[serialIndex] = {
-        number: newSerial,
-        date: newDate
-    };
-
-    localStorage.setItem("donors", JSON.stringify(donors));
-    toggleSerial(donorIndex);
-    toggleSerial(donorIndex);
-}
-
 function editDonor(index){
     localStorage.setItem("editIndex", index);
-    localStorage.removeItem("editSerialIndex");
     window.location.href="donor-entry.html";
-}
-
-function deleteSerial(donorIndex, serialIndex){
-    let donors = JSON.parse(localStorage.getItem("donors")) || [];
-    donors[donorIndex].serials.splice(serialIndex,1);
-    localStorage.setItem("donors",JSON.stringify(donors));
-    renderTable();
 }
 
 function deleteDonor(index){
