@@ -7,12 +7,12 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial;
-            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
 
         header {
-            background: #b30000;
+            background-color: #b30000;
             color: white;
             padding: 15px;
             text-align: center;
@@ -25,51 +25,60 @@
         }
 
         .container {
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+            max-width: 950px;
+            margin: 30px auto;
             background: white;
-            margin-top: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
         }
 
-        th, td {
+        .donor-card {
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: 0.3s;
         }
 
-        th {
-            background: #b30000;
-            color: white;
+        .donor-card:hover {
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
         }
-
-        .A { background: blue; color: white; }
-        .B { background: yellow; }
-        .O { background: white; }
-        .AB { background: pink; }
 
         .missing {
-            color: red;
+            background-color: #ffe6e6;
+            border: 1px solid red;
+        }
+
+        .count {
             font-weight: bold;
+            color: #b30000;
+            margin-bottom: 5px;
         }
 
-        button {
-            padding: 5px 10px;
-            margin: 2px;
+        .btn {
+            padding: 6px 10px;
+            margin: 5px 5px 0 0;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 12px;
         }
 
-        .edit-btn { background: #4CAF50; color: white; }
-        .delete-btn { background: red; color: white; }
+        .serial-btn { background: #0066cc; color: white; }
+        .edit-btn { background: #28a745; color: white; }
+        .delete-btn { background: #d11a2a; color: white; }
+        .missing-btn { background: orange; color: white; }
 
-        .top-controls {
-            margin-bottom: 10px;
+        .back-btn {
+            width: 100%;
+            padding: 10px;
+            background: gray;
+            color: white;
+            font-weight: bold;
+            margin-top: 20px;
         }
+
     </style>
 </head>
 
@@ -80,71 +89,64 @@
     <h2>Donor Tracking</h2>
 </header>
 
+<div class="container" id="donorList">
+    <!-- Donors will load here -->
+</div>
+
 <div class="container">
-
-    <div class="top-controls">
-        <input type="text" id="searchInput" placeholder="Search name..." onkeyup="loadDonors()">
-        <button onclick="goBack()">Back</button>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Blood</th>
-                <th>Name</th>
-                <th>Birthday</th>
-                <th>Contact</th>
-                <th>Serial</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="donorTable"></tbody>
-    </table>
-
+    <button class="btn back-btn" onclick="goBack()">Back to Dashboard</button>
 </div>
 
 <script>
     function loadDonors() {
         var donors = JSON.parse(localStorage.getItem("donors")) || [];
-        var table = document.getElementById("donorTable");
-        var search = document.getElementById("searchInput").value.toLowerCase();
+        var container = document.getElementById("donorList");
+        container.innerHTML = "";
 
-        table.innerHTML = "";
+        if (donors.length === 0) {
+            container.innerHTML = "<p>No donors recorded yet.</p>";
+            return;
+        }
 
         donors.forEach(function(donor, index) {
 
-            var fullName = donor.firstName + " " + donor.middleName + " " + donor.surname;
+            var card = document.createElement("div");
+            card.className = "donor-card";
 
-            if (fullName.toLowerCase().includes(search)) {
-
-                var serialDisplay = donor.serial ? donor.serial : "<span class='missing'>Missing</span>";
-
-                table.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td class="${donor.bloodType}">${donor.bloodType || ""}</td>
-                        <td>${fullName}</td>
-                        <td>${donor.birthday || ""}</td>
-                        <td>${donor.contact || ""}</td>
-                        <td>${serialDisplay}</td>
-                        <td>
-                            <button class="edit-btn" onclick="editDonor(${index})">Edit</button>
-                            <button class="delete-btn" onclick="deleteDonor(${index})">Delete</button>
-                        </td>
-                    </tr>
-                `;
+            if (donor.missing) {
+                card.classList.add("missing");
             }
+
+            card.innerHTML = `
+                <div class="count">#${index + 1}</div>
+                <strong>${donor.firstName} ${donor.middleName} ${donor.surname}</strong><br>
+                Blood Type: ${donor.bloodType}<br>
+                Birthday: ${donor.birthday}<br>
+                Contact: ${donor.contact}<br>
+                Serial Number: ${donor.serial ? donor.serial : "None"}<br>
+
+                <button class="btn serial-btn" onclick="addSerial(${index})">+ Serial</button>
+                <button class="btn edit-btn" onclick="editDonor(${index})">Edit</button>
+                <button class="btn delete-btn" onclick="deleteDonor(${index})">Delete</button>
+                <button class="btn missing-btn" onclick="markMissing(${index})">
+                    ${donor.missing ? "Unmark Missing" : "Missing"}
+                </button>
+            `;
+
+            container.appendChild(card);
         });
     }
 
-    function deleteDonor(index) {
+    function addSerial(index) {
         var donors = JSON.parse(localStorage.getItem("donors")) || [];
 
-        if (confirm("Delete this donor?")) {
-            donors.splice(index, 1);
+        var newSerial = prompt("Enter new Serial Number:");
+
+        if (newSerial !== null && newSerial.trim() !== "") {
+            donors[index].serial = newSerial.trim();
             localStorage.setItem("donors", JSON.stringify(donors));
             loadDonors();
+            alert("Serial Number Updated!");
         }
     }
 
@@ -153,8 +155,30 @@
         window.location.href = "donor-entry.html";
     }
 
+    function deleteDonor(index) {
+        var donors = JSON.parse(localStorage.getItem("donors")) || [];
+
+        if (confirm("Are you sure you want to delete this donor?")) {
+            donors.splice(index, 1);
+            localStorage.setItem("donors", JSON.stringify(donors));
+            loadDonors();
+        }
+    }
+
+    function markMissing(index) {
+        var donors = JSON.parse(localStorage.getItem("donors")) || [];
+
+        donors[index].missing = !donorHasMissing(donors[index]);
+        localStorage.setItem("donors", JSON.stringify(donors));
+        loadDonors();
+    }
+
+    function donorHasMissing(donor) {
+        return donor.missing === true;
+    }
+
     function goBack() {
-        window.location.href = "donor-entry.html";
+        window.location.href = "dashboard.html";
     }
 
     loadDonors();
