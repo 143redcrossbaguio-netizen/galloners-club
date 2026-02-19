@@ -5,107 +5,24 @@
     <meta charset="UTF-8">
 
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #b30000;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .logo {
-            width: 100px;
-            display: block;
-            margin: 10px auto;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #b30000;
-        }
-
-        .blood-types {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .blood-btn {
-            flex: 1;
-            margin: 5px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 2px solid transparent;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        header { background-color: #b30000; color: white; padding: 15px; text-align: center; }
+        .logo { width: 100px; display: block; margin: 10px auto; }
+        .container { max-width: 600px; margin: 30px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0px 3px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #b30000; }
+        .blood-types { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .blood-btn { flex: 1; margin: 5px; padding: 10px; border-radius: 5px; border: 2px solid transparent; font-weight: bold; cursor: pointer; }
         .type-a { background: blue; color: white; }
         .type-b { background: yellow; color: black; }
         .type-o { background: white; color: black; border: 1px solid #ccc; }
         .type-ab { background: pink; color: black; }
-
-        .selected {
-            border: 3px solid #b30000 !important;
-            transform: scale(1.05);
-        }
-
-        /* NEW: Positive/Negative beside blood type */
-        .rh-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .rh-container label {
-            cursor: pointer;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .serial-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 5px;
-        }
-
-        .serial-row input {
-            flex: 1;
-        }
-
-        button.main-btn {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-        }
-
+        .selected { border: 3px solid #b30000 !important; transform: scale(1.05); }
+        .rh-container { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; font-weight: bold; }
+        .rh-container label { cursor: pointer; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .serial-row { display: flex; gap: 10px; margin-bottom: 5px; }
+        .serial-row input { flex: 1; }
+        button.main-btn { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
         .save-btn { background-color: #b30000; }
         .tracking-btn { background-color: #ff4d4d; }
         .back-btn { background-color: gray; }
@@ -130,7 +47,6 @@
         <button class="blood-btn type-ab" onclick="setBloodType(this,'AB')">AB</button>
     </div>
 
-    <!-- NEW: Positive / Negative beside blood type -->
     <div class="rh-container">
         <label><input type="radio" name="rhFactor" value="Positive"> Positive</label>
         <label><input type="radio" name="rhFactor" value="Negative"> Negative</label>
@@ -144,7 +60,6 @@
     <input type="date" id="birthday">
     <input type="text" id="contact" placeholder="Contact Number">
 
-    <!-- UPDATED SERIAL SECTION -->
     <div id="serialContainer">
         <div class="serial-row">
             <input type="text" class="serialInput" placeholder="Serial Number">
@@ -161,73 +76,124 @@
 </div>
 
 <script>
-    function setBloodType(button, type) {
-        document.getElementById("bloodType").value = type;
 
-        var buttons = document.querySelectorAll(".blood-btn");
-        buttons.forEach(btn => btn.classList.remove("selected"));
+function setBloodType(button, type) {
+    document.getElementById("bloodType").value = type;
+    var buttons = document.querySelectorAll(".blood-btn");
+    buttons.forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
+}
 
-        button.classList.add("selected");
-    }
+function addSerialRow(serial="", date="") {
+    var container = document.getElementById("serialContainer");
 
-    function addSerialRow() {
-        var container = document.getElementById("serialContainer");
+    var row = document.createElement("div");
+    row.className = "serial-row";
 
-        var row = document.createElement("div");
-        row.className = "serial-row";
+    row.innerHTML = `
+        <input type="text" class="serialInput" placeholder="Serial Number" value="${serial}">
+        <input type="date" class="serialDate" value="${date}">
+    `;
 
-        row.innerHTML = `
-            <input type="text" class="serialInput" placeholder="Serial Number">
-            <input type="date" class="serialDate">
-        `;
+    container.appendChild(row);
+}
 
-        container.appendChild(row);
-    }
+function saveDonor() {
 
-    function saveDonor() {
+    var rhSelected = document.querySelector('input[name="rhFactor"]:checked');
+    var rhValue = rhSelected ? rhSelected.value : "";
 
-        var rhSelected = document.querySelector('input[name="rhFactor"]:checked');
-        var rhValue = rhSelected ? rhSelected.value : "";
+    var serialInputs = document.querySelectorAll(".serialInput");
+    var serialDates = document.querySelectorAll(".serialDate");
 
-        var serialInputs = document.querySelectorAll(".serialInput");
-        var serialDates = document.querySelectorAll(".serialDate");
+    var serials = [];
 
-        var serials = [];
-
-        for (var i = 0; i < serialInputs.length; i++) {
-            if (serialInputs[i].value !== "") {
-                serials.push({
-                    serial: serialInputs[i].value,
-                    date: serialDates[i].value
-                });
-            }
+    for (var i = 0; i < serialInputs.length; i++) {
+        if (serialInputs[i].value !== "") {
+            serials.push({
+                number: serialInputs[i].value,
+                date: serialDates[i].value
+            });
         }
+    }
 
-        var donor = {
-            bloodType: document.getElementById("bloodType").value,
-            rhFactor: rhValue,
-            firstName: document.getElementById("firstName").value,
-            middleName: document.getElementById("middleName").value,
-            surname: document.getElementById("surname").value,
-            birthday: document.getElementById("birthday").value,
-            contact: document.getElementById("contact").value,
-            serials: serials
-        };
+    var donor = {
+        bloodType: document.getElementById("bloodType").value,
+        rhFactor: rhValue,
+        firstName: document.getElementById("firstName").value,
+        middleName: document.getElementById("middleName").value,
+        surname: document.getElementById("surname").value,
+        birthday: document.getElementById("birthday").value,
+        contact: document.getElementById("contact").value,
+        serials: serials
+    };
 
-        var donors = JSON.parse(localStorage.getItem("donors")) || [];
+    var donors = JSON.parse(localStorage.getItem("donors")) || [];
+    var editIndex = localStorage.getItem("editIndex");
+
+    if(editIndex !== null){
+        donors[editIndex] = donor;
+        localStorage.removeItem("editIndex");
+        localStorage.removeItem("editSerialIndex");
+        alert("Donor Updated Successfully!");
+    } else {
         donors.push(donor);
-        localStorage.setItem("donors", JSON.stringify(donors));
-
         alert("Donor Saved Successfully!");
     }
 
-    function goBack() {
-        window.location.href = "dashboard.html";
-    }
+    localStorage.setItem("donors", JSON.stringify(donors));
+}
 
-    function goTracking() {
-        window.location.href = "tracking.html";
+function goBack() { window.location.href = "dashboard.html"; }
+function goTracking() { window.location.href = "tracking.html"; }
+
+/* =========================
+   AUTO-FILL EDIT FIX
+========================= */
+
+window.onload = function(){
+
+    var donors = JSON.parse(localStorage.getItem("donors")) || [];
+    var editIndex = localStorage.getItem("editIndex");
+
+    if(editIndex !== null){
+
+        var donor = donors[editIndex];
+
+        document.getElementById("bloodType").value = donor.bloodType || "";
+
+        // Highlight blood button
+        var buttons = document.querySelectorAll(".blood-btn");
+        buttons.forEach(btn=>{
+            if(btn.innerText === donor.bloodType){
+                btn.classList.add("selected");
+            }
+        });
+
+        // Set RH
+        if(donor.rhFactor){
+            document.querySelector(`input[name="rhFactor"][value="${donor.rhFactor}"]`).checked = true;
+        }
+
+        document.getElementById("firstName").value = donor.firstName || "";
+        document.getElementById("middleName").value = donor.middleName || "";
+        document.getElementById("surname").value = donor.surname || "";
+        document.getElementById("birthday").value = donor.birthday || "";
+        document.getElementById("contact").value = donor.contact || "";
+
+        // Clear default serial row
+        document.getElementById("serialContainer").innerHTML = "";
+
+        if(donor.serials && donor.serials.length > 0){
+            donor.serials.forEach(s=>{
+                addSerialRow(s.number, s.date);
+            });
+        } else {
+            addSerialRow();
+        }
     }
+};
+
 </script>
 
 </body>
