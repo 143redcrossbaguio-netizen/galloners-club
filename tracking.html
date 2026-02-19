@@ -22,12 +22,6 @@
         .silver-btn { background:#9e9e9e; color:white; }
         .gold-btn { background:#d4af37; color:black; }
         .filter-btn { background:#222; color:white; font-weight:bold; }
-
-        /* BLOOD TYPE COLORS */
-        .blood-A { background:#2196f3; color:white; font-weight:bold; }
-        .blood-B { background:#ffeb3b; color:black; font-weight:bold; }
-        .blood-O { background:white; color:black; font-weight:bold; }
-        .blood-AB { background:#ff69b4; color:white; font-weight:bold; }
     </style>
 </head>
 
@@ -106,7 +100,7 @@ function renderTable(category=null){
         <tr>
             <td>${index+1}</td>
             <td>${donor.firstName} ${donor.middleName} ${donor.surname}</td>
-            <td class="blood-${donor.bloodType}">${donor.bloodType || ""} ${donor.rhFactor || ""}</td>
+            <td>${donor.bloodType || ""} ${donor.rhFactor || ""}</td>
             <td>${donor.contact || ""}</td>
             <td>
                 ${serialCount}
