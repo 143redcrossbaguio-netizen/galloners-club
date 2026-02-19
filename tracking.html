@@ -126,10 +126,11 @@
     <div class="top-controls">
         <input type="text" id="searchBox" placeholder="Search donor name..." onkeyup="searchDonor()">
 
-        <button class="btn" onclick="showLevel('galloners')">Galloners</button>
-        <button class="btn" onclick="showLevel('bronze')">Bronze</button>
-        <button class="btn" onclick="showLevel('silver')">Silver</button>
-        <button class="btn" onclick="showLevel('gold')">Gold</button>
+        <button class="btn" onclick="filterLevel('all')">All</button>
+        <button class="btn" onclick="filterLevel('galloners')">Galloners</button>
+        <button class="btn" onclick="filterLevel('bronze')">Bronze</button>
+        <button class="btn" onclick="filterLevel('silver')">Silver</button>
+        <button class="btn" onclick="filterLevel('gold')">Gold</button>
     </div>
 
     <div id="levelDisplay" class="level-display"></div>
@@ -153,22 +154,31 @@
 
 <script>
 
+let currentLevelFilter = "all";
+
 function loadDonors() {
     var donors = JSON.parse(localStorage.getItem("donors")) || [];
     var table = document.getElementById("donorTable");
     table.innerHTML = "";
 
+    var filteredTotalSerials = 0;
+
     donors.forEach(function(donor, index) {
 
-        if (!donor.serials) {
-            donor.serials = [];
+        if (!donor.serials) donor.serials = [];
+
+        var serialCount = donor.serials.length;
+        var level = getLevel(serialCount);
+
+        if (currentLevelFilter !== "all" && level !== currentLevelFilter) {
+            return;
         }
+
+        filteredTotalSerials += serialCount;
 
         var row = document.createElement("tr");
 
-        if (donor.missing) {
-            row.classList.add("missing");
-        }
+        if (donor.missing) row.classList.add("missing");
 
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -190,7 +200,7 @@ function loadDonors() {
             <td>${donor.contact}</td>
 
             <td>
-                <span class="count-badge">${donor.serials.length}</span>
+                <span class="count-badge">${serialCount}</span>
             </td>
 
             <td>
@@ -208,7 +218,24 @@ function loadDonors() {
         table.appendChild(row);
     });
 
+    document.getElementById("levelDisplay").innerText =
+        currentLevelFilter.toUpperCase() +
+        " - Total Serial Numbers: " + filteredTotalSerials;
+
     localStorage.setItem("donors", JSON.stringify(donors));
+}
+
+function getLevel(count) {
+    if (count >= 1 && count <= 7) return "galloners";
+    if (count >= 8 && count <= 27) return "bronze";
+    if (count >= 28 && count <= 45) return "silver";
+    if (count >= 46) return "gold";
+    return "none";
+}
+
+function filterLevel(level) {
+    currentLevelFilter = level;
+    loadDonors();
 }
 
 function getBloodColor(type) {
@@ -235,8 +262,7 @@ function showSerialInput(index) {
 
 function saveSerial(index) {
     var donors = JSON.parse(localStorage.getItem("donors")) || [];
-    var input = document.getElementById("newSerial-" + index);
-    var value = input.value.trim();
+    var value = document.getElementById("newSerial-" + index).value.trim();
 
     if (value !== "") {
         donors[index].serials.push(value);
@@ -277,23 +303,6 @@ function searchDonor() {
             row.style.display = "none";
         }
     });
-}
-
-function showLevel(level) {
-    var display = document.getElementById("levelDisplay");
-
-    if (level === "galloners") {
-        display.innerText = "Galloners - Total of 8 Serial Numbers";
-    }
-    if (level === "bronze") {
-        display.innerText = "Bronze - Total of 28 Serial Numbers";
-    }
-    if (level === "silver") {
-        display.innerText = "Silver - Total of 46 Serial Numbers";
-    }
-    if (level === "gold") {
-        display.innerText = "Gold - Total of 70 Serial Numbers";
-    }
 }
 
 function goBack() {
