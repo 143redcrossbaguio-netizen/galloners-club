@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Galloners Club - Tracking</title>
+    <meta charset="UTF-8">
 
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f4f4f4;
+        }
+
+        header {
+            background: #b30000;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        select, input {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #b30000;
+            color: white;
+        }
+
+        .A { background: blue; color: white; }
+        .B { background: yellow; }
+        .O { background: white; }
+        .AB { background: pink; }
+
+        button {
+            padding: 8px 15px;
+            margin-top: 10px;
+            background: gray;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <img src="images/logo.png" class="logo">
+    <h2>Donor Tracking</h2>
+</header>
+
+<div class="container">
+
+    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="loadDonors()">
+
+    <select id="filterBlood" onchange="loadDonors()">
+        <option value="">All Blood Types</option>
+        <option value="A">Type A</option>
+        <option value="B">Type B</option>
+        <option value="O">Type O</option>
+        <option value="AB">Type AB</option>
+    </select>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Blood</th>
+                <th>Name</th>
+                <th>Birthday</th>
+                <th>Contact</th>
+                <th>Serial</th>
+            </tr>
+        </thead>
+        <tbody id="donorTable"></tbody>
+    </table>
+
+    <button onclick="goBack()">Back</button>
+
+</div>
+
+<script>
+    function loadDonors() {
+        var donors = JSON.parse(localStorage.getItem("donors")) || [];
+        var table = document.getElementById("donorTable");
+        var search = document.getElementById("searchInput").value.toLowerCase();
+        var filter = document.getElementById("filterBlood").value;
+
+        table.innerHTML = "";
+
+        donors.forEach(function(donor) {
+            var fullName = donor.firstName + " " + donor.middleName + " " + donor.surname;
+
+            if ((fullName.toLowerCase().includes(search)) &&
+                (filter === "" || donor.bloodType === filter)) {
+
+                table.innerHTML += `
+                    <tr>
+                        <td class="${donor.bloodType}">${donor.bloodType}</td>
+                        <td>${fullName}</td>
+                        <td>${donor.birthday}</td>
+                        <td>${donor.contact}</td>
+                        <td>${donor.serial}</td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    function goBack() {
+        window.location.href = "donor-entry.html";
+    }
+
+    loadDonors();
+</script>
+
+</body>
+</html>
