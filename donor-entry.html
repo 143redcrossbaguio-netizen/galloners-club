@@ -49,8 +49,6 @@
         button {
             width: 100%;
             padding: 10px;
-            background-color: #b30000;
-            color: white;
             border: none;
             border-radius: 5px;
             font-weight: bold;
@@ -58,12 +56,31 @@
             margin-top: 10px;
         }
 
-        button:hover {
+        .save-btn {
+            background-color: #b30000;
+            color: white;
+        }
+
+        .save-btn:hover {
             background-color: #800000;
+        }
+
+        .tracking-btn {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .tracking-btn:hover {
+            background-color: #cc0000;
         }
 
         .back-btn {
             background-color: gray;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #555;
         }
     </style>
 </head>
@@ -84,7 +101,8 @@
     <input type="text" id="contact" placeholder="Contact Number">
     <input type="text" id="serial" placeholder="Serial Number">
 
-    <button onclick="saveDonor()">Save Donor</button>
+    <button class="save-btn" onclick="saveDonor()">Save Donor</button>
+    <button class="tracking-btn" onclick="goTracking()">Go to Tracking</button>
     <button class="back-btn" onclick="goBack()">Back to Dashboard</button>
 
 </div>
@@ -116,6 +134,10 @@
 
     function goBack() {
         window.location.href = "dashboard.html";
+    }
+
+    function goTracking() {
+        window.location.href = "tracking.html";
     }
 </script>
 
