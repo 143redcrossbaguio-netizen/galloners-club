@@ -63,17 +63,20 @@
     <input type="text" id="middleName" placeholder="Middle Name">
     <input type="text" id="surname" placeholder="Surname">
 
-    <!-- BLOOD TYPE OPTIONS ADDED -->
+    <!-- ORIGINAL BLOOD TYPE FIELD (UNCHANGED) -->
     <select id="bloodType">
         <option value="">Select Blood Type</option>
-        <option value="A+">A+</option>
-        <option value="A-">A-</option>
-        <option value="B+">B+</option>
-        <option value="B-">B-</option>
-        <option value="O+">O+</option>
-        <option value="O-">O-</option>
-        <option value="AB+">AB+</option>
-        <option value="AB-">AB-</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="AB">AB</option>
+        <option value="O">O</option>
+    </select>
+
+    <!-- ADDED POSITIVE / NEGATIVE OPTION BELOW BLOOD TYPE -->
+    <select id="rhFactor">
+        <option value="">Select Positive / Negative</option>
+        <option value="Positive">Positive (+)</option>
+        <option value="Negative">Negative (-)</option>
     </select>
 
     <input type="text" id="contact" placeholder="Contact Number">
@@ -92,6 +95,7 @@ function saveDonor(){
         middleName: document.getElementById("middleName").value,
         surname: document.getElementById("surname").value,
         bloodType: document.getElementById("bloodType").value,
+        rhFactor: document.getElementById("rhFactor").value,
         contact: document.getElementById("contact").value,
         serials: []
     };
@@ -121,6 +125,7 @@ window.onload = function(){
         document.getElementById("middleName").value = donor.middleName || "";
         document.getElementById("surname").value = donor.surname || "";
         document.getElementById("bloodType").value = donor.bloodType || "";
+        document.getElementById("rhFactor").value = donor.rhFactor || "";
         document.getElementById("contact").value = donor.contact || "";
     }
 };
