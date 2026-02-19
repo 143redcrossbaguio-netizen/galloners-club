@@ -2,64 +2,69 @@
 <html>
 <head>
     <title>Galloners Club - Dashboard</title>
+    <meta charset="UTF-8">
+
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #b30000;
+            color: white;
+            padding: 15px;
             text-align: center;
         }
 
-        .header {
-            background-color: #b30000;
-            color: white;
+        .container {
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
             padding: 20px;
-            font-size: 22px;
-        }
-
-        .header img {
-            width: 50px;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-
-        .content {
-            margin-top: 50px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #b30000;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #800000;
+        .card:hover {
+            background-color: #ffe6e6;
+        }
+
+        a {
+            text-decoration: none;
+            color: black;
         }
     </style>
 </head>
+
 <body>
 
-<div class="header">
-    <img src="images/logo.png" alt="Galloners Club Logo">
-    Galloners Club Dashboard
-</div>
+    <header>
+        <h2>Galloners Club Dashboard</h2>
+    </header>
 
-<div class="content">
-    <h2>Welcome, Admin</h2>
-    <p>You are successfully logged in.</p>
+    <div class="container">
 
-    <button onclick="logout()">Logout</button>
-</div>
+        <a href="#">
+            <div class="card">
+                <h3>Donor Entry</h3>
+                <p>Add new donor information</p>
+            </div>
+        </a>
 
-<script>
-function logout() {
-    window.location.href = "index.html";
-}
-</script>
+        <a href="#">
+            <div class="card">
+                <h3>Tracking</h3>
+                <p>View donation records</p>
+            </div>
+        </a>
+
+    </div>
 
 </body>
 </html>
