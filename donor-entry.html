@@ -1,23 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Donor Entry</title>
+    <title>Galloners Club - Tracking</title>
+    <meta charset="UTF-8">
+
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            font-family: Arial;
+            background: #f4f4f4;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        header {
+            background: #b30000;
+            color: white;
+            padding: 15px;
+            text-align: center;
         }
 
-        input, select {
-            padding: 5px;
-            margin: 5px 0;
+        .logo {
+            width: 100px;
+            display: block;
+            margin: 10px auto;
         }
+
+        .container {
+            padding: 20px;
+        }
+
+        select, input {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #b30000;
+            color: white;
+        }
+
+        .A { background: blue; color: white; }
+        .B { background: yellow; }
+        .O { background: white; }
+        .AB { background: pink; }
 
         button {
-            padding: 5px 10px;
+            padding: 8px 15px;
+            margin-top: 10px;
+            background: gray;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
     </style>
@@ -25,119 +70,91 @@
 
 <body>
 
-<h2>Donor Entry</h2>
+<header>
+    <img src="images/logo.png" class="logo">
+    <h2>Donor Tracking</h2>
+</header>
 
-<form id="donorForm">
+<div class="container">
 
-    <div class="form-group">
-        <label>First Name</label><br>
-        <input type="text" id="firstName">
-    </div>
+    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="loadDonors()">
 
-    <div class="form-group">
-        <label>Middle Name</label><br>
-        <input type="text" id="middleName">
-    </div>
+    <select id="filterBlood" onchange="loadDonors()">
+        <option value="">All Blood Types</option>
+        <option value="A">Type A</option>
+        <option value="B">Type B</option>
+        <option value="O">Type O</option>
+        <option value="AB">Type AB</option>
+    </select>
 
-    <div class="form-group">
-        <label>Surname</label><br>
-        <input type="text" id="surname">
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Blood</th>
+                <th>Name</th>
+                <th>Birthday</th>
+                <th>Contact</th>
+                <th>Serial</th>
+            </tr>
+        </thead>
+        <tbody id="donorTable"></tbody>
+    </table>
 
-    <div class="form-group">
-        <label>Birthday</label><br>
-        <input type="date" id="birthday">
-    </div>
+    <button onclick="goBack()">Back</button>
 
-    <div class="form-group">
-        <label>Contact Number</label><br>
-        <input type="text" id="contact">
-    </div>
-
-    <div class="form-group">
-        <label>Blood Type</label><br>
-        <select id="bloodType">
-            <option value="">Select</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="AB">AB</option>
-            <option value="O">O</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Serial Number</label><br>
-
-        <div id="serialContainer">
-            <div style="margin-bottom:5px;">
-                <input type="text" name="serial[]" placeholder="Serial Number">
-                <input type="date" name="serialDate[]">
-            </div>
-        </div>
-
-        <button type="button" onclick="addSerialField()">+</button>
-    </div>
-
-    <button type="button" onclick="saveDonor()">Save</button>
-
-</form>
+</div>
 
 <script>
+    function loadDonors() {
+        var donors = JSON.parse(localStorage.getItem("donors")) || [];
+        var table = document.getElementById("donorTable");
+        var search = document.getElementById("searchInput").value.toLowerCase();
+        var filter = document.getElementById("filterBlood").value;
 
-function addSerialField() {
-    let container = document.getElementById("serialContainer");
+        table.innerHTML = "";
 
-    let newField = document.createElement("div");
-    newField.style.marginBottom = "5px";
+        donors.forEach(function(donor) {
 
-    newField.innerHTML = `
-        <input type="text" name="serial[]" placeholder="Serial Number">
-        <input type="date" name="serialDate[]">
-    `;
+            var fullName = donor.firstName + " " + donor.middleName + " " + donor.surname;
 
-    container.appendChild(newField);
-}
+            if ((fullName.toLowerCase().includes(search)) &&
+                (filter === "" || donor.bloodType === filter)) {
 
-function saveDonor() {
+                // 🔹 ADD: Show blood type + Positive/Negative beside it
+                var bloodDisplay = donor.bloodType;
+                if (donor.rhFactor) {
+                    bloodDisplay += " " + donor.rhFactor;
+                }
 
-    let serialInputs = document.getElementsByName("serial[]");
-    let dateInputs = document.getElementsByName("serialDate[]");
+                // 🔹 ADD: Support multiple serial numbers with dates
+                var serialDisplay = "";
 
-    let serials = [];
+                if (Array.isArray(donor.serials)) {
+                    donor.serials.forEach(function(item) {
+                        serialDisplay += item.serial + " (" + item.date + ")<br>";
+                    });
+                } else if (donor.serial) {
+                    serialDisplay = donor.serial;
+                }
 
-    for (let i = 0; i < serialInputs.length; i++) {
-        if (serialInputs[i].value !== "") {
-            serials.push({
-                serial: serialInputs[i].value,
-                date: dateInputs[i].value
-            });
-        }
+                table.innerHTML += `
+                    <tr>
+                        <td class="${donor.bloodType}">${bloodDisplay}</td>
+                        <td>${fullName}</td>
+                        <td>${donor.birthday}</td>
+                        <td>${donor.contact}</td>
+                        <td>${serialDisplay}</td>
+                    </tr>
+                `;
+            }
+        });
     }
 
-    let donor = {
-        firstName: document.getElementById("firstName").value,
-        middleName: document.getElementById("middleName").value,
-        surname: document.getElementById("surname").value,
-        birthday: document.getElementById("birthday").value,
-        contact: document.getElementById("contact").value,
-        bloodType: document.getElementById("bloodType").value,
-        serials: serials
-    };
+    function goBack() {
+        window.location.href = "donor-entry.html";
+    }
 
-    let donors = JSON.parse(localStorage.getItem("donors")) || [];
-    donors.push(donor);
-    localStorage.setItem("donors", JSON.stringify(donors));
-
-    alert("Donor Saved");
-    document.getElementById("donorForm").reset();
-    document.getElementById("serialContainer").innerHTML = `
-        <div style="margin-bottom:5px;">
-            <input type="text" name="serial[]" placeholder="Serial Number">
-            <input type="date" name="serialDate[]">
-        </div>
-    `;
-}
-
+    loadDonors();
 </script>
 
 </body>
