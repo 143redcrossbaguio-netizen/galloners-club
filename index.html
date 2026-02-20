@@ -63,7 +63,6 @@
 <body>
 
     <div class="login-box">
-        <!-- Make sure this path matches your folder exactly -->
         <img src="images/logo.png" alt="Galloners Club Logo" class="logo">
 
         <h2>Galloners Club</h2>
@@ -84,6 +83,10 @@
             } else {
                 alert("Invalid Username or Password");
             }
+        }
+
+        function logout() {
+            window.location.href = "login.html";
         }
     </script>
 
