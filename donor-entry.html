@@ -150,9 +150,9 @@ function saveDonor() {
     }
 
     let donorData = {
-        firstName: document.getElementById("firstName").value,
-        middleName: document.getElementById("middleName").value,
-        surname: document.getElementById("surname").value,
+        firstName: document.getElementById("firstName").value.trim(),
+        middleName: document.getElementById("middleName").value.trim(),
+        surname: document.getElementById("surname").value.trim(),
         birthday: document.getElementById("birthday").value,
         contact: document.getElementById("contact").value,
         bloodType: document.getElementById("bloodType").value,
@@ -165,15 +165,25 @@ function saveDonor() {
     if(editIndex !== null){
         donors[editIndex] = donorData;
     } else {
-        donors.push(donorData);
+
+        // CHECK FOR EXISTING DONOR
+        let existingIndex = donors.findIndex(d =>
+            d.firstName === donorData.firstName &&
+            d.middleName === donorData.middleName &&
+            d.surname === donorData.surname &&
+            d.birthday === donorData.birthday
+        );
+
+        if(existingIndex !== -1){
+            // ADD SERIALS TO EXISTING DONOR
+            donors[existingIndex].serials = donors[existingIndex].serials.concat(serials);
+        } else {
+            donors.push(donorData);
+        }
     }
 
     localStorage.setItem("donors", JSON.stringify(donors));
-
-    // FIX: always clear editIndex after saving
     localStorage.removeItem("editIndex");
-
-    // Redirect to tracking page
     window.location.href = "tracking.html";
 }
 
