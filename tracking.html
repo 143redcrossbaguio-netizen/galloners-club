@@ -208,11 +208,22 @@ function deleteDonor(index){
 function filterByCategory(type){ renderTable(type); }
 
 function searchDonor(){
-    let input=document.getElementById("searchInput").value.toLowerCase();
-    let rows=document.querySelectorAll("#donorTable tr");
-    rows.forEach(row=>{
-        let text=row.innerText.toLowerCase();
-        row.style.display=text.includes(input)?"":"none";
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let rows = document.querySelectorAll("#donorTable tr");
+
+    rows.forEach((row,i)=>{
+        if(i % 2 === 0){ 
+            let text = row.innerText.toLowerCase();
+            let match = text.includes(input);
+            row.style.display = match ? "" : "none";
+
+            let serialRow = rows[i+1];
+            if(serialRow){
+                if(!match){
+                    serialRow.style.display="none";
+                }
+            }
+        }
     });
 }
 
